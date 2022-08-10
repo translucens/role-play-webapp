@@ -10,37 +10,54 @@ terraform {
 provider "google" {
   #credentials = file(var.credentials_file)
   project = var.project
-  region  = "asia-northeast1"
-  zone    = "asia-northeast1-c"
-}
-resource "google_project_service" "enable_api" {
-  service = "compute.googleapis.com"
 }
 
-resource "google_compute_network" "vpc_network" {
-  name = "my-network"
+resource "google_compute_network" "default" {
+  name = "minami-network"
+}
+
+resource "google_compute_subnetwork" "default" {
+  name          = "minami-subnet"
+  region        = "asia-northeast1"
+  network       = google_compute_network.default.id
+  ip_cidr_range = "10.0.0.0/16"
+}
+
+resource "google_compute_address" "default" {
+  name         = "ipv4-address"
+  region       = "asia-northeast1"
+  address_type = "EXTERNAL"
+}
+
+resource "google_project_service" "enable_api" {
+  service = "compute.googleapis.com"
 }
 
 resource "google_compute_instance" "vm_instance" {
   name         = "my-instance"
   machine_type = "n1-standard-1"
+  zone = "asia-northeast1-b"
+  tags = ["http-server","https-server"]
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-9"
+      image = "debian-cloud/debian-10"
     }
   }
   network_interface {
-    network = google_compute_network.vpc_network.self_link
+    network = google_compute_network.default.self_link
     access_config {
-      nat_ip = google_compute_address.vm_static_ip.address
+      nat_ip = google_compute_address.default.address
     }
   }
+
+  metadata = {
+    enable-oslogin="TRUE"
+  }
+
+ metadata_startup_script = "os-setup-script.sh"
 }
 
 
-resource "google_compute_address" "vm_static_ip" {
-  name = "static-ip"
-}
 
   
 
