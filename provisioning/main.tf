@@ -13,11 +13,11 @@ provider "google" {
 }
 
 resource "google_compute_network" "default" {
-  name = "minami-network"
+  name = "scstore"
 }
 
 resource "google_compute_subnetwork" "default" {
-  name          = "minami-subnet"
+  name          = "my-subnet"
   region        = "asia-northeast1"
   network       = google_compute_network.default.id
   ip_cidr_range = "10.0.0.0/16"
@@ -34,9 +34,9 @@ resource "google_project_service" "enable_api" {
 }
 
 resource "google_compute_instance" "vm_instance" {
-  name         = "my-instance"
+  name         = "scstore"
   machine_type = "n1-standard-1"
-  zone = "asia-northeast1-b"
+  zone = "asia-northeast1-c"
   tags = ["http-server","https-server"]
   boot_disk {
     initialize_params {
@@ -54,10 +54,11 @@ resource "google_compute_instance" "vm_instance" {
     enable-oslogin="TRUE"
   }
 
- metadata_startup_script = "os-setup-script.sh"
+ metadata_startup_script = "/startup.sh"
 }
 
 
 
   
+
 
