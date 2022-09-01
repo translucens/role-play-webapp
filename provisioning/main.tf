@@ -23,21 +23,21 @@ resource "google_compute_subnetwork" "default" {
   ip_cidr_range = "10.0.0.0/16"
 }
 
+resource "google_project_service" "enable_api" {
+  service = "compute.googleapis.com"
+}
+
 resource "google_compute_address" "default" {
   name         = "ipv4-address"
   region       = "asia-northeast1"
   address_type = "EXTERNAL"
 }
 
-resource "google_project_service" "enable_api" {
-  service = "compute.googleapis.com"
-}
-
 resource "google_compute_instance" "vm_instance" {
   name         = "scstore"
-  machine_type = "n1-standard-1"
+  machine_type = "e2-standard-2"
   zone = "asia-northeast1-c"
-  tags = ["http-server","https-server"]
+  tags = ["http-server"]
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-10"
@@ -54,11 +54,25 @@ resource "google_compute_instance" "vm_instance" {
     enable-oslogin="TRUE"
   }
 
- metadata_startup_script = "/startup.sh"
+  metadata_startup_script =  file("${path.module}/startup.sh")
+}
+
+resource "google_compute_firewall" "default" {
+  name    = "allow-ingress-from-internet"
+  network = google_compute_network.default.name
+
+  allow {
+    protocol = "tcp"
+    ports = ["22","80"]
+  }
+  direction = "INGRESS"
+  source_ranges = ["0.0.0.0/0"]
 }
 
 
 
+
   
+
 
 
