@@ -49,8 +49,9 @@ install_dependencies() {
 }
 
 deploy_roleplay_webapp() {
-    git clone https://github.com/mittz/role-play-webapp.git
-    cd ~/role-play-webapp/webapp && make upgrade-compose && make all
+    git clone https://github.com/mittz/role-play-webapp.git /root/role-play-webapp && \
+    cd /root/role-play-webapp/webapp && make upgrade-compose && \
+    make all
 }
 
 install_dependencies
