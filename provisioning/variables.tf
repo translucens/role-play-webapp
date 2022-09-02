@@ -37,7 +37,7 @@ variable "gce_image_name" {
 variable "cloudsql_machine_type" {
     description = "Cloud SQL Machine Type"
     type        = string
-    default     = "db-n1-standard-1"
+    default     = "db-custom-1-3840"
 }
 
 variable "database_scstore_password" {
