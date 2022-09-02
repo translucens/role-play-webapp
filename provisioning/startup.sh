@@ -51,6 +51,8 @@ install_dependencies() {
 create_env_file() {
     ENV_FILE_PATH="$1/.env"
 
+    touch $ENV_FILE_PATH
+
     echo DB_HOSTNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_hostname" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
     echo DB_PORT=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_port" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
     echo DB_USERNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_username" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
@@ -65,6 +67,7 @@ deploy_roleplay_webapp() {
 
     create_env_file $CLONE_PATH
 
+    GOCACHE=/usr/local/go/cache GOBIN=/usr/local/go/bin GOPATH=/usr/local/go && \
     cd $CLONE_PATH/webapp && \
     make upgrade-compose && \
     make all
