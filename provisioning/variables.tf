@@ -1,7 +1,4 @@
-variable "project_id" {
-    description = "Project ID"
-    type        = string
-}
+variable "project_id" {}
 
 variable "region" {
     description = "Region"
@@ -17,6 +14,11 @@ variable "zone" {
 
 variable "service_name" {
     description = "Service name"
+    type        = string
+}
+
+variable "benchmark_service_account_name" {
+    description = "Service Account name for Benchmark"
     type        = string
 }
 

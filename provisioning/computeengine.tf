@@ -1,6 +1,6 @@
 resource "google_compute_instance" "scstore" {
   name         = var.service_name
-  machine_type = var.machine_type
+  machine_type = var.gce_machine_type
   zone         = var.zone
   tags         = ["http-server"]
   boot_disk {
