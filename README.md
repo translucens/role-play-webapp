@@ -13,6 +13,7 @@ This provides resources for the competition of `Role Play Series - Web Applicati
 
 ```shell
 $ git clone git@github.com:mittz/role-play-webapp.git
+$ export TF_VAR_project=”YOUR_PROJECT_ID”
 $ cd provisioning
 $ terraform init
 $ terraform apply
