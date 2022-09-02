@@ -17,6 +17,10 @@ resource "google_compute_instance" "scstore" {
 
   metadata = {
     enable-oslogin = "TRUE"
+    db_hostname = google_sql_database_instance.scstore.private_ip_address
+    db_port = 5432
+    db_username = var.service_name
+    db_name = var.service_name
   }
 
   metadata_startup_script = file("${path.module}/startup.sh")

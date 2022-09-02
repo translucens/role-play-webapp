@@ -1,5 +1,13 @@
 # Deploy on GCP by Terraform
 
+Enable required services:
+
+```
+gcloud services enable compute.googleapis.com sqladmin.googleapis.com iam.googleapis.com servicenetworking.googleapis.com
+```
+
+Deploy the sample web application:
+
 ```
 git clone https://github.com/mittz/role-play-webapp.git
 cd role-play-webapp/provisioning
