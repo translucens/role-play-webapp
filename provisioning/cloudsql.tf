@@ -6,6 +6,8 @@ resource "google_sql_database_instance" "scstore" {
   name             = "${var.service_name}-${random_id.db_instance_name_suffix.hex}"
   database_version = "POSTGRES_14"
 
+  depends_on = [google_service_networking_connection.private_vpc_connection]
+
   settings {
     tier              = var.cloudsql_machine_type
     availability_type = "REGIONAL"

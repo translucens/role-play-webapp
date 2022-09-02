@@ -3,7 +3,6 @@ locals {
         "compute.googleapis.com",
         "sqladmin.googleapis.com",
         "iam.googleapis.com",
-        "servicenetworking.googleapis.com",
    ])
 }
 
