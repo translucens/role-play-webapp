@@ -67,7 +67,9 @@ deploy_roleplay_webapp() {
 
     create_env_file $CLONE_PATH
 
-    GOCACHE=/usr/local/go/cache GOBIN=/usr/local/go/bin GOPATH=/usr/local/go && \
+    export GOCACHE=/usr/local/go/cache && \
+    export GOBIN=/usr/local/go/bin && \
+    export GOPATH=/usr/local/go && \
     cd $CLONE_PATH/webapp && \
     make upgrade-compose && \
     make all
