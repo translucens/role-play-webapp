@@ -65,7 +65,7 @@ deploy_roleplay_webapp() {
     CLONE_PATH="/root/role-play-webapp"
     git clone https://github.com/mittz/role-play-webapp.git $CLONE_PATH
 
-    create_env_file $CLONE_PATH
+    create_env_file $CLONE_PATH/webapp
 
     export GOCACHE=/usr/local/go/cache && \
     export GOBIN=/usr/local/go/bin && \
