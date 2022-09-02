@@ -4,27 +4,12 @@ services:
     image: scstore:1.0.0
     container_name: "scstore-app"
     environment:
-      - DB_HOSTNAME=scstore-database
-      - DB_PORT=5432
-      - DB_USERNAME=scstore
-      - DB_PASSWORD=scstore
-      - DB_NAME=scstore
+      - DB_HOSTNAME=${DB_HOSTNAME}
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
       - GIN_MODE=release
-      - GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
     ports:
       - "80:8080"
-    depends_on:
-      scstore-database:
-        condition: service_healthy
-  scstore-database:
-    image: postgres:14.2
-    container_name: "scstore-database"
-    environment:
-      - POSTGRES_USER=scstore
-      - POSTGRES_PASSWORD=scstore
-      - POSTGRES_DB=scstore
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
