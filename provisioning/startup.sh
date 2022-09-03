@@ -51,14 +51,33 @@ install_dependencies() {
 create_env_file() {
     ENV_FILE_PATH="$1/.env"
 
-    touch $ENV_FILE_PATH
+    if [ ! -e ${ENV_FILE_PATH}]; then
+        touch $ENV_FILE_PATH
+    fi
 
-    echo DB_HOSTNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_hostname" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo DB_PORT=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_port" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo DB_USERNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_username" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo DB_PASSWORD=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_password" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo DB_NAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_name" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo GOOGLE_CLOUD_PROJECT=`curl "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
+    if [ -z ${DB_HOSTNAME} ]; then
+        echo DB_HOSTNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_hostname" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${DB_PORT} ]; then
+        echo DB_PORT=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_port" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${DB_USERNAME} ]; then
+        echo DB_USERNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_username" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${DB_PASSWORD} ]; then
+        echo DB_PASSWORD=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_password" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${DB_NAME} ]; then
+        echo DB_NAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_name" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${GOOGLE_CLOUD_PROJECT} ]; then
+        echo GOOGLE_CLOUD_PROJECT=`curl "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
 }
 
 deploy_roleplay_webapp() {
