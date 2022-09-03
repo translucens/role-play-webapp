@@ -8,7 +8,6 @@ install_golang() {
     wget https://go.dev/dl/go1.18.2.linux-amd64.tar.gz
     rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.2.linux-amd64.tar.gz
     echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
-    source ~/.bashrc
     source /etc/profile
 }
 
@@ -22,11 +21,11 @@ install_docker() {
     $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     apt-get update -y
     apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+    sleep 10 # Wait for docker to start
 }
 
 install_docker_compose() {
     apt install docker-compose -y
-    systemctl restart docker
 }
 
 install_make() {
@@ -84,6 +83,11 @@ deploy_roleplay_webapp() {
     git clone https://github.com/mittz/role-play-webapp.git $CLONE_PATH
 
     create_env_file $CLONE_PATH/webapp
+
+    count=`ps -ef | grep dockerd | grep -v grep | wc -l`
+    if [ ${count} = 0 ]; then
+        systemctl start docker
+    fi
 
     export GOCACHE=/usr/local/go/cache && \
     export GOBIN=/usr/local/go/bin && \
