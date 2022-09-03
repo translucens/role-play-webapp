@@ -22,12 +22,11 @@ install_docker() {
     $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     apt-get update -y
     apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-
-    systemctl restart docker
 }
 
 install_docker_compose() {
     apt install docker-compose -y
+    systemctl restart docker
 }
 
 install_make() {
