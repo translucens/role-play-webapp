@@ -1,3 +1,5 @@
+data "google_compute_default_service_account" "default" {}
+
 resource "google_compute_instance" "scstore" {
   name         = var.service_name
   machine_type = var.gce_machine_type
@@ -25,4 +27,9 @@ resource "google_compute_instance" "scstore" {
   }
 
   metadata_startup_script = file("${path.module}/startup.sh")
+
+  service_account {
+    email = data.google_compute_default_service_account.default.email
+    scopes = ["cloud-platform"]
+  }
 }
