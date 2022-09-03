@@ -15,7 +15,7 @@ resource "google_sql_database_instance" "scstore" {
     ip_configuration {
       ipv4_enabled        = false
       private_network     = google_compute_network.default.id
-      require_ssl         = true
+      require_ssl         = false
       allocated_ip_range  = null
     }
   }
