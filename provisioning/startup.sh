@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 install_wget() {
     apt install wget -y
@@ -8,7 +8,6 @@ install_golang() {
     wget https://go.dev/dl/go1.18.2.linux-amd64.tar.gz
     rm -rf /usr/local/go && tar -C /usr/local -xzf go1.18.2.linux-amd64.tar.gz
     echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile
-    source ~/.bashrc
     source /etc/profile
 }
 
@@ -22,8 +21,7 @@ install_docker() {
     $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     apt-get update -y
     apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
-
-    systemctl restart docker
+    sleep 10 # Wait for docker to start
 }
 
 install_docker_compose() {
@@ -51,14 +49,33 @@ install_dependencies() {
 create_env_file() {
     ENV_FILE_PATH="$1/.env"
 
-    touch $ENV_FILE_PATH
+    if [ ! -e ${ENV_FILE_PATH}]; then
+        touch $ENV_FILE_PATH
+    fi
 
-    echo DB_HOSTNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_hostname" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo DB_PORT=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_port" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo DB_USERNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_username" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo DB_PASSWORD=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_password" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo DB_NAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_name" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
-    echo GOOGLE_CLOUD_PROJECT=`curl "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google"` >> $ENV_FILE_PATH
+    if [ -z ${DB_HOSTNAME} ]; then
+        echo DB_HOSTNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_hostname" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${DB_PORT} ]; then
+        echo DB_PORT=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_port" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${DB_USERNAME} ]; then
+        echo DB_USERNAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_username" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${DB_PASSWORD} ]; then
+        echo DB_PASSWORD=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_password" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${DB_NAME} ]; then
+        echo DB_NAME=`curl "http://metadata.google.internal/computeMetadata/v1/instance/attributes/db_name" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
+
+    if [ -z ${GOOGLE_CLOUD_PROJECT} ]; then
+        echo GOOGLE_CLOUD_PROJECT=`curl "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google"` >> ${ENV_FILE_PATH}
+    fi
 }
 
 deploy_roleplay_webapp() {
@@ -66,6 +83,11 @@ deploy_roleplay_webapp() {
     git clone https://github.com/mittz/role-play-webapp.git $CLONE_PATH
 
     create_env_file $CLONE_PATH/webapp
+
+    count=`ps -ef | grep dockerd | grep -v grep | wc -l`
+    if [ ${count} = 0 ]; then
+        systemctl start docker
+    fi
 
     export GOCACHE=/usr/local/go/cache && \
     export GOBIN=/usr/local/go/bin && \
