@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 install_wget() {
     apt install wget -y
