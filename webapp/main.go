@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"cloud.google.com/go/profiler"
 	_ "github.com/lib/pq"
 
 	"github.com/mittz/role-play-webapp/webapp/app"
@@ -12,7 +13,17 @@ import (
 	"github.com/mittz/role-play-webapp/webapp/utils"
 )
 
+var version = "HEAD"
+
 func main() {
+	cfg := profiler.Config{
+		Service:        "roleplay",
+		ServiceVersion: version,
+	}
+	if err := profiler.Start(cfg); err != nil {
+		log.Fatalln(err)
+	}
+
 	dbInfo := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
 		utils.GetEnvDBHostname(),
 		utils.GetEnvDBPort(),
