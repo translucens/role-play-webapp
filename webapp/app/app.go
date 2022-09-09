@@ -112,6 +112,10 @@ func getProductsEndpoint(c *gin.Context) {
 	})
 }
 
+func getHealthCheck(c *gin.Context) {
+	c.String(http.StatusOK, "OK")
+}
+
 func SetupRouter(dbh database.DatabaseHandler, assetsDir string, templatesDirMatch string) *gin.Engine {
 	dbHandler = dbh
 
@@ -149,6 +153,8 @@ func SetupRouter(dbh database.DatabaseHandler, assetsDir string, templatesDirMat
 	router.GET("/products", getProductsEndpoint)
 	router.GET("/checkouts", getCheckoutsEndpoint)
 	router.POST("/checkout", postCheckoutEndpoint)
+
+	router.GET("/healthcheck", getHealthCheck)
 
 	return router
 }
