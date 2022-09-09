@@ -160,19 +160,13 @@ func (dbh ProdDatabaseHandler) GetCheckouts(userID int) ([]Checkout, error) {
 	db := dbh.DB
 	query := `
 	SELECT
-	  checkouts.id               AS checkout_id,
-	  users.id                   AS user_id,
-	  users.name                 AS user_name,
-	  products.id                AS product_id,
 	  products.name              AS product_name,
-	  products.price             AS product_price,
 	  products.image             AS product_image,
 	  checkouts.product_quantity AS checkout_product_quantity,
 	  checkouts.created_at       AS checkout_created_at
 	FROM checkouts
-	LEFT JOIN users ON checkouts.user_id = users.id
-	LEFT JOIN products ON checkouts.product_id = products.id
-	WHERE users.id = $1
+	INNER JOIN products ON checkouts.product_id = products.id
+	WHERE checkouts.user_id = $1
 	`
 
 	rows, err := db.Query(query, userID)
@@ -182,7 +176,7 @@ func (dbh ProdDatabaseHandler) GetCheckouts(userID int) ([]Checkout, error) {
 
 	for rows.Next() {
 		var checkout Checkout
-		if err := rows.Scan(&checkout.ID, &checkout.User.ID, &checkout.User.Name, &checkout.Product.ID, &checkout.Product.Name, &checkout.Product.Price, &checkout.Product.Image, &checkout.ProductQuantity, &checkout.CreatedAt); err != nil {
+		if err := rows.Scan(&checkout.Product.Name, &checkout.Product.Image, &checkout.ProductQuantity, &checkout.CreatedAt); err != nil {
 			return checkouts, err
 		}
 
@@ -192,26 +186,26 @@ func (dbh ProdDatabaseHandler) GetCheckouts(userID int) ([]Checkout, error) {
 	return checkouts, nil
 }
 
-func (dbh ProdDatabaseHandler) CreateCheckout(userID int, productID int, productQuantity int) (string, error) {
+func (dbh ProdDatabaseHandler) CreateCheckout(userID int, productID int, productQuantity int) (time.Time, error) {
 	uuidObj, err := uuid.NewRandom()
+	createdAt := time.Now()
 	checkoutID := uuidObj.String()
 	if err != nil {
-		return "", nil
+		return createdAt, nil
 	}
 
 	db := dbh.DB
 	query := "INSERT INTO checkouts (id, user_id, product_id, product_quantity, created_at) VALUES ($1, $2, $3, $4, $5)"
-	if _, err := db.Exec(query, checkoutID, userID, productID, productQuantity, time.Now()); err != nil {
-		return "", err
+	if _, err := db.Exec(query, checkoutID, userID, productID, productQuantity, createdAt); err != nil {
+		return createdAt, err
 	}
 
-	return checkoutID, nil
+	return createdAt, nil
 }
 
 func (dbh ProdDatabaseHandler) GetCheckout(checkoutID string) (Checkout, error) {
 	checkout := Checkout{
 		Product: Product{},
-		User:    User{},
 	}
 
 	// err := dbh.Conn.Joins("Product").Find(&checkout, checkoutID).Error
@@ -233,9 +227,6 @@ func (dbh ProdDatabaseHandler) GetCheckout(checkoutID string) (Checkout, error) 
 	WHERE checkouts.id = $1
 	`
 	if err := db.QueryRow(query, checkoutID).Scan(
-		&checkout.ID,
-		&checkout.User.ID,
-		&checkout.User.Name,
 		&checkout.Product.ID,
 		&checkout.Product.Name,
 		&checkout.Product.Price,

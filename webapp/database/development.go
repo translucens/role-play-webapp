@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"time"
 )
 
 type DevDatabaseHandler struct {
@@ -36,12 +37,10 @@ func (dbh DevDatabaseHandler) GetProducts() ([]Product, error) {
 func (dbh DevDatabaseHandler) GetCheckouts(userID int) ([]Checkout, error) {
 	checkouts := []Checkout{
 		{
-			User:            User{ID: userID},
 			Product:         Product{Price: 100, Image: "image/product1.png"},
 			ProductQuantity: 111,
 		},
 		{
-			User:            User{ID: userID},
 			Product:         Product{Price: 200, Image: "image/product2.png"},
 			ProductQuantity: 222,
 		},
@@ -50,14 +49,6 @@ func (dbh DevDatabaseHandler) GetCheckouts(userID int) ([]Checkout, error) {
 	return checkouts, nil
 }
 
-func (dbh DevDatabaseHandler) CreateCheckout(userID int, productID int, productQuantity int) (string, error) {
-	return "", nil
-}
-
-func (dbh DevDatabaseHandler) GetCheckout(checkoutID string) (Checkout, error) {
-	checkout := Checkout{
-		ID: checkoutID, Product: Product{Name: "product1", Image: "image/product1.png"}, ProductQuantity: 111,
-	}
-
-	return checkout, nil
+func (dbh DevDatabaseHandler) CreateCheckout(userID int, productID int, productQuantity int) (time.Time, error) {
+	return time.Now(), nil
 }

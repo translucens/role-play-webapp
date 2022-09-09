@@ -13,8 +13,7 @@ type DatabaseHandler interface {
 	GetProduct(id int) (Product, error)
 	GetProducts() ([]Product, error)
 	GetCheckouts(userID int) ([]Checkout, error)
-	CreateCheckout(userID int, productID int, productQuantity int) (string, error)
-	GetCheckout(checkoutID string) (Checkout, error)
+	CreateCheckout(userID int, productID int, productQuantity int) (time.Time, error)
 }
 
 const InitDataJSONFileName = "initdata.json"
@@ -36,8 +35,6 @@ type User struct {
 }
 
 type Checkout struct {
-	ID              string
-	User            User
 	Product         Product
 	ProductQuantity int
 	CreatedAt       time.Time

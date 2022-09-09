@@ -62,21 +62,25 @@ func postCheckoutEndpoint(c *gin.Context) {
 		return
 	}
 
-	checkoutID, err := dbHandler.CreateCheckout(userID, productID, productQuantity)
+	createdAt, err := dbHandler.CreateCheckout(userID, productID, productQuantity)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	checkout, err := dbHandler.GetCheckout(checkoutID)
+	product, err := dbHandler.GetProduct(productID)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	c.HTML(http.StatusAccepted, "checkout.html", gin.H{
-		"title":    "Checkout",
-		"checkout": checkout,
+		"title": "Checkout",
+		"checkout": database.Checkout{
+			Product:         product,
+			ProductQuantity: productQuantity,
+			CreatedAt:       createdAt,
+		},
 	})
 }
 
