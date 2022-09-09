@@ -93,6 +93,7 @@ func getProductEndpoint(c *gin.Context) {
 		return
 	}
 
+	c.Header("Cache-Control", "max-age=300")
 	c.HTML(http.StatusOK, "product.html", gin.H{
 		"title":   "Product",
 		"product": product,
@@ -106,6 +107,7 @@ func getProductsEndpoint(c *gin.Context) {
 		return
 	}
 
+	c.Header("Cache-Control", "max-age=300")
 	c.HTML(http.StatusOK, "products.html", gin.H{
 		"title":    "Products",
 		"products": products,
