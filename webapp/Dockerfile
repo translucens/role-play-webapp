@@ -8,7 +8,7 @@ ENV ROOT=/go/src/${APP_NAME}
 WORKDIR ${ROOT}
 
 COPY . .
-RUN GOOS=linux go build -v -o $APP_NAME
+RUN GOOS=linux go build -v -o $APP_NAME -tags=nomsgpack
 
 
 FROM gcr.io/distroless/base
