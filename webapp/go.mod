@@ -5,7 +5,7 @@ go 1.17
 require (
 	cloud.google.com/go/profiler v0.3.0
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.8.2
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.8.7
 	github.com/gin-gonic/gin v1.8.1
 	github.com/google/uuid v1.3.0
 	github.com/lib/pq v1.10.7
@@ -19,7 +19,7 @@ require (
 	cloud.google.com/go v0.100.2 // indirect
 	cloud.google.com/go/compute v1.6.1 // indirect
 	cloud.google.com/go/trace v1.2.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.32.2 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.32.7 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
@@ -52,9 +52,9 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/api v0.78.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220518221133-4f43b3371335 // indirect
-	google.golang.org/grpc v1.46.0 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/genproto v0.0.0-20220829175752-36a9c930ecbf // indirect
+	google.golang.org/grpc v1.49.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
