@@ -1,9 +1,9 @@
 package database
 
 import (
+	"context"
 	"regexp"
 	"testing"
-	"time"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -90,7 +90,7 @@ func TestGetCheckouts(t *testing.T) {
 			Image: "product00001.png",
 		},
 		ProductQuantity: 1,
-		CreatedAt:       time.Now(),
+		CreatedAt:       "2022-01-02",
 	}
 
 	checkout2 := Checkout{
@@ -99,7 +99,7 @@ func TestGetCheckouts(t *testing.T) {
 			Image: "product00002.png",
 		},
 		ProductQuantity: 2,
-		CreatedAt:       time.Now(),
+		CreatedAt:       "2022-02-03",
 	}
 
 	mock.ExpectQuery(regexp.QuoteMeta(
@@ -109,7 +109,7 @@ func TestGetCheckouts(t *testing.T) {
 			AddRow(checkout1.Product.Name, checkout1.Product.Image, checkout1.ProductQuantity, checkout1.CreatedAt).
 			AddRow(checkout2.Product.Name, checkout2.Product.Image, checkout2.ProductQuantity, checkout2.CreatedAt))
 
-	checkouts, err := mdb.GetCheckouts(userID)
+	checkouts, err := mdb.GetCheckouts(context.Background(), userID)
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(checkouts))
 	assert.Equal(t, checkout1, checkouts[0])

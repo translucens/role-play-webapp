@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"cloud.google.com/go/profiler"
-	_ "github.com/lib/pq"
+	_ "github.com/googleapis/go-sql-spanner"
 
 	"github.com/mittz/role-play-webapp/webapp/app"
 	"github.com/mittz/role-play-webapp/webapp/database"
@@ -24,15 +24,13 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	dbInfo := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
-		utils.GetEnvDBHostname(),
-		utils.GetEnvDBPort(),
-		utils.GetEnvDBUsername(),
+	dbInfo := fmt.Sprintf("projects/%s/instances/%s/databases/%s",
+		utils.GetEnvProjectID(),
+		utils.GetEnvDBInstanceID(),
 		utils.GetEnvDBName(),
-		utils.GetEnvDBPassword(),
 	)
 
-	db, err := sql.Open("postgres", dbInfo)
+	db, err := sql.Open("spanner", dbInfo)
 	defer db.Close()
 	if err != nil {
 		log.Fatal(err)
