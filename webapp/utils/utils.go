@@ -1,31 +1,15 @@
 package utils
 
 import (
-	"log"
 	"os"
-	"strconv"
 )
 
-func GetEnvDBHostname() string {
-	return getEnv("DB_HOSTNAME", "scstore-database")
+func GetEnvProjectID() string {
+	return getEnv("GOOGLE_CLOUD_PROJECT", "")
 }
 
-func GetEnvDBPort() int {
-	val := getEnv("DB_PORT", "5432")
-	port, err := strconv.Atoi(val)
-	if err != nil {
-		log.Fatalf("DB_PORT should be integer, but %s: %v", val, err)
-	}
-
-	return port
-}
-
-func GetEnvDBUsername() string {
-	return getEnv("DB_USERNAME", "scstore")
-}
-
-func GetEnvDBPassword() string {
-	return getEnv("DB_PASSWORD", "scstore")
+func GetEnvDBInstanceID() string {
+	return getEnv("DB_INSTANCE_ID", "scstore")
 }
 
 func GetEnvDBName() string {

@@ -35,7 +35,7 @@ func postInitEndpoint(c *gin.Context) {
 
 func getCheckoutsEndpoint(c *gin.Context) {
 	userID := getUserID()
-	checkouts, err := dbHandler.GetCheckouts(userID)
+	checkouts, err := dbHandler.GetCheckouts(c.Request.Context(), userID)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "%v", err)
 		return

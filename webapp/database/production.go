@@ -1,9 +1,11 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -30,32 +32,52 @@ func (dbh ProdDatabaseHandler) InitDatabase() error {
 
 	db := dbh.DB
 
+	queryTablenames := `
+SELECT
+  table_name
+FROM
+  information_schema.tables
+WHERE table_name IN ('products', 'users', 'checkouts')
+`
+
+	tableNames, err := db.Query(queryTablenames)
+	if err != nil {
+		return err
+	}
+
+	existProducts, existUsers, existCheckouts := false, false, false
+
+	for tableNames.Next() {
+		table := ""
+		tableNames.Scan(&table)
+
+		switch strings.ToLower(table) {
+		case "products":
+			existProducts = true
+		case "users":
+			existUsers = true
+		case "checkouts":
+			existCheckouts = true
+		}
+	}
+
 	// Don't use "IF EXISTS" as it is not supported by Spanner PGAdapter.
-	queryCheckProductsTable := "SELECT * FROM products"
 	queryDropProductsTables := "DROP TABLE products"
-	_, err = db.Query(queryCheckProductsTable)
-	tableExists := (err == nil)
-	if tableExists {
+	if existProducts {
 		if _, err := db.Exec(queryDropProductsTables); err != nil {
 			return err
 		}
 	}
 
-	queryCheckUsersTable := "SELECT * FROM users"
 	queryDropUsersTables := "DROP TABLE users"
-	_, err = db.Query(queryCheckUsersTable)
-	tableExists = (err == nil)
-	if tableExists {
+	if existUsers {
 		if _, err := db.Exec(queryDropUsersTables); err != nil {
 			return err
 		}
 	}
 
-	queryCheckCheckoutsTable := "SELECT * FROM checkouts"
 	queryDropCheckoutsTables := "DROP TABLE checkouts"
-	_, err = db.Query(queryCheckCheckoutsTable)
-	tableExists = (err == nil)
-	if tableExists {
+	if existCheckouts {
 		if _, err := db.Exec(queryDropCheckoutsTables); err != nil {
 			return err
 		}
@@ -64,31 +86,28 @@ func (dbh ProdDatabaseHandler) InitDatabase() error {
 	// Don't use "IF EXISTS" as it is not supported by Spanner PGAdapter.
 	queryCreateProductsTable := `
 	CREATE TABLE products (
-		id bigint NOT NULL,
-		name character varying(20) NOT NULL,
-		price bigint NOT NULL,
-		image character varying(100) NOT NULL,
-		PRIMARY KEY(id)
-	)
+		id INT64 NOT NULL,
+		name STRING(20) NOT NULL,
+		price INT64 NOT NULL,
+		image STRING(100) NOT NULL
+	) PRIMARY KEY(id)
 	`
 
 	queryCreateUsersTable := `
 	CREATE TABLE users (
-		id bigint NOT NULL,
-		name character varying(20) NOT NULL,
-		PRIMARY KEY(id)
-	)
+		id INT64 NOT NULL,
+		name STRING(20) NOT NULL
+	) PRIMARY KEY(id)
 	`
 
 	queryCreateCheckoutsTable := `
 	CREATE TABLE checkouts (
-		id character varying(40) NOT NULL,
-		user_id bigint,
-		product_id bigint,
-		product_quantity bigint,
-		created_at date,
-		PRIMARY KEY(id)
-	)
+		id STRING(40) NOT NULL,
+		user_id INT64,
+		product_id INT64,
+		product_quantity INT64,
+		created_at DATE
+	) PRIMARY KEY(id)
 	`
 
 	if _, err := db.Exec(queryCreateProductsTable); err != nil {
@@ -103,14 +122,14 @@ func (dbh ProdDatabaseHandler) InitDatabase() error {
 		return err
 	}
 
-	queryInsertProduct := "INSERT INTO products VALUES($1, $2, $3, $4)"
+	queryInsertProduct := "INSERT INTO products (id, name, price, image) VALUES(?, ?, ?, ?)"
 	for _, product := range jsonData.Products {
 		if _, err := db.Exec(queryInsertProduct, product.ID, product.Name, product.Price, product.Image); err != nil {
 			return err
 		}
 	}
 
-	queryInsertUser := "INSERT INTO users VALUES($1, $2)"
+	queryInsertUser := "INSERT INTO users (id, name) VALUES(?, ?)"
 	for _, user := range jsonData.Users {
 		if _, err := db.Exec(queryInsertUser, user.ID, user.Name); err != nil {
 			return err
@@ -124,7 +143,7 @@ func (dbh ProdDatabaseHandler) GetProduct(id int) (Product, error) {
 	var product Product
 
 	db := dbh.DB
-	query := "SELECT id, name, price, image FROM products WHERE id = $1"
+	query := "SELECT id, name, price, image FROM products WHERE id = ?"
 	if err := db.QueryRow(query, id).Scan(&product.ID, &product.Name, &product.Price, &product.Image); err != nil {
 		return product, err
 	}
@@ -154,22 +173,22 @@ func (dbh ProdDatabaseHandler) GetProducts() ([]Product, error) {
 	return products, nil
 }
 
-func (dbh ProdDatabaseHandler) GetCheckouts(userID int) ([]Checkout, error) {
+func (dbh ProdDatabaseHandler) GetCheckouts(ctx context.Context, userID int) ([]Checkout, error) {
 	var checkouts []Checkout
 
 	db := dbh.DB
 	query := `
 	SELECT
-	  products.name              AS product_name,
-	  products.image             AS product_image,
-	  checkouts.product_quantity AS checkout_product_quantity,
-	  checkouts.created_at       AS checkout_created_at
+	  products.name                           AS product_name,
+	  products.image                          AS product_image,
+	  checkouts.product_quantity              AS checkout_product_quantity,
+	  FORMAT_DATE('%F', checkouts.created_at) AS checkout_created_at
 	FROM checkouts
 	INNER JOIN products ON checkouts.product_id = products.id
-	WHERE checkouts.user_id = $1
+	WHERE checkouts.user_id = ?
 	`
 
-	rows, err := db.Query(query, userID)
+	rows, err := db.QueryContext(ctx, query, userID)
 	if err != nil {
 		return checkouts, err
 	}
@@ -186,16 +205,16 @@ func (dbh ProdDatabaseHandler) GetCheckouts(userID int) ([]Checkout, error) {
 	return checkouts, nil
 }
 
-func (dbh ProdDatabaseHandler) CreateCheckout(userID int, productID int, productQuantity int) (time.Time, error) {
+func (dbh ProdDatabaseHandler) CreateCheckout(userID int, productID int, productQuantity int) (string, error) {
 	uuidObj, err := uuid.NewRandom()
-	createdAt := time.Now()
+	createdAt := time.Now().Format("2006-01-02")
 	checkoutID := uuidObj.String()
 	if err != nil {
 		return createdAt, nil
 	}
 
 	db := dbh.DB
-	query := "INSERT INTO checkouts (id, user_id, product_id, product_quantity, created_at) VALUES ($1, $2, $3, $4, $5)"
+	query := "INSERT INTO checkouts (id, user_id, product_id, product_quantity, created_at) VALUES (?, ?, ?, ?, ?)"
 	if _, err := db.Exec(query, checkoutID, userID, productID, productQuantity, createdAt); err != nil {
 		return createdAt, err
 	}
@@ -220,11 +239,11 @@ func (dbh ProdDatabaseHandler) GetCheckout(checkoutID string) (Checkout, error) 
 	  products.price,
 	  products.image,
 	  checkouts.product_quantity,
-	  checkouts.created_at
+	  FORMAT_DATE('%F', checkouts.created_at)
 	FROM checkouts
 	LEFT JOIN users ON checkouts.user_id = users.id
 	LEFT JOIN products ON checkouts.product_id = products.id
-	WHERE checkouts.id = $1
+	WHERE checkouts.id = ?
 	`
 	if err := db.QueryRow(query, checkoutID).Scan(
 		&checkout.Product.ID,

@@ -1,9 +1,9 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 )
@@ -12,8 +12,8 @@ type DatabaseHandler interface {
 	InitDatabase() error
 	GetProduct(id int) (Product, error)
 	GetProducts() ([]Product, error)
-	GetCheckouts(userID int) ([]Checkout, error)
-	CreateCheckout(userID int, productID int, productQuantity int) (time.Time, error)
+	GetCheckouts(ctx context.Context, userID int) ([]Checkout, error)
+	CreateCheckout(userID int, productID int, productQuantity int) (string, error)
 }
 
 const InitDataJSONFileName = "initdata.json"
@@ -37,7 +37,7 @@ type User struct {
 type Checkout struct {
 	Product         Product
 	ProductQuantity int
-	CreatedAt       time.Time
+	CreatedAt       string
 }
 
 type Blob struct {
