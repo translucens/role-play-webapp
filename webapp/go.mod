@@ -9,10 +9,10 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/google/uuid v1.3.0
 	github.com/googleapis/go-sql-spanner v0.0.0-20220903142155-2c97068e002c
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.35.0
-	go.opentelemetry.io/otel v1.10.0
-	go.opentelemetry.io/otel/sdk v1.9.0
+	go.opentelemetry.io/otel v1.11.2
+	go.opentelemetry.io/otel/sdk v1.11.2
 )
 
 require (
@@ -37,7 +37,7 @@ require (
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/pprof v0.0.0-20220412212628-83db2b799d1f // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.1.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.5.1 // indirect
@@ -50,13 +50,13 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.opentelemetry.io/otel/trace v1.10.0 // indirect
+	go.opentelemetry.io/otel/trace v1.11.2 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094 // indirect
-	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
+	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/api v0.94.0 // indirect
